@@ -1,3 +1,4 @@
+import './SignUp.css';
 const SignUp = () => {
 	return <h2>SignUp</h2>;
 };

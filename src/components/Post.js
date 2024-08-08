@@ -1,3 +1,4 @@
+import './Post.css';
 import { useState } from 'react';
 
 const Post = (props) => {
