@@ -2,8 +2,10 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Post from '../components/Post';
 import './Home.css';
+import AddPost from '../components/AddPost';
+import FollowRecomendations from '../components/FollowRecomendations';
 
-const Home = () => {
+const Home = (props) => {
 	const [posts, setPosts] = useState([]);
 	const getLatestPosts = (res) => {
 		axios
@@ -16,6 +18,18 @@ const Home = () => {
 			});
 	};
 
+	const getPrevPosts = (res) => {
+		axios
+			.post('https://akademia108.pl/api/social-app/post/newer-then', {
+				date: posts[0].created_at,
+			})
+			.then((res) => {
+				setPosts(res.data.concat(posts));
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	};
 	const getNextPosts = (res) => {
 		axios
 			.post('https://akademia108.pl/api/social-app/post/older-then', {
@@ -31,14 +45,29 @@ const Home = () => {
 
 	useEffect(() => {
 		getLatestPosts();
-	}, []);
+	}, [props.user]);
 	console.log(posts);
 	return (
 		<div>
 			<h2>Home</h2>
+			{props.user && <AddPost props={getPrevPosts} />}
+			{props.user && (
+				<FollowRecomendations
+					user={props.user}
+					getLatestPosts={getLatestPosts}
+					posts={posts}
+				/>
+			)}
 			<div className='postList'>
 				{posts.map((post) => {
-					return <Post post={post} key={post.id} />;
+					return (
+						<Post
+							post={post}
+							key={post.id}
+							user={props.user}
+							setPosts={setPosts}
+						/>
+					);
 				})}
 				<button className='btn loadMore' onClick={getNextPosts}>
 					Read more

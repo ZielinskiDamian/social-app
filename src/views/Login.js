@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import './Login.css';
-const Login = () => {
+import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+const Login = (props) => {
 	const [formData, setFormData] = useState({
 		username: '',
 		password: '',
 	});
+
+	const [loginMessage, setloginMessage] = useState('');
 
 	const handleInputChange = (e) => {
 		const target = e.target;
@@ -13,9 +17,36 @@ const Login = () => {
 		setFormData({ ...formData, [name]: target.value });
 	};
 
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		axios
+			.post('https://akademia108.pl/api/social-app/user/login', {
+				username: formData.username,
+				password: formData.password,
+			})
+			.then((res) => {
+				if (Array.isArray(res.data.username)) {
+					setloginMessage(res.data.username[0]);
+				} else if (Array.isArray(res.data.password)) {
+					setloginMessage(res.data.password[0]);
+				} else if (res.data.password) {
+					setloginMessage('Incorect username or password');
+				} else {
+					setloginMessage('')
+					props.setUser(res.data);
+					localStorage.setItem('user', JSON.stringify(res.data));
+				}
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	};
+
 	return (
 		<div className='login'>
-			<form>
+			{props.user && <Navigate to="/"/>}
+			<form onSubmit={handleSubmit}>
+				{loginMessage && <h2>{loginMessage}</h2>}
 				<input
 					type='text'
 					name='username'
