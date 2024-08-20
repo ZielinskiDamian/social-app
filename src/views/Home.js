@@ -66,6 +66,7 @@ const Home = (props) => {
 							key={post.id}
 							user={props.user}
 							setPosts={setPosts}
+							getLatestPosts={getLatestPosts}
 						/>
 					);
 				})}
